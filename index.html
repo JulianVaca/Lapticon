@@ -2,66 +2,296 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Portal de Encomiendas Lapticon</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal de Encomiendas Lapticon | Radar Aéreo</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Portal de Encomiendas Lapticon</h1>
+  <div class="bg-cyber"></div>
 
-  <!-- Bloque 1: Login -->
-  <section id="login-section">
-    <h2>Iniciar sesión</h2>
-    <form id="login-form">
-      <input type="email" id="login-email" placeholder="Correo" required />
-      <input type="password" id="login-password" placeholder="Contraseña" required />
-      <button type="submit">Ingresar</button>
-    </form>
-    <p id="login-status"></p>
-  </section>
-
-  <!-- El resto de la app queda oculto hasta iniciar sesión -->
-  <section id="app-section" hidden>
-    <p id="welcome-message"></p>
-
-    <!-- Bloque 2: Catálogo de ciudades -->
-    <h2>Ciudades</h2>
-    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-      <select id="origen-select">
-        <option value="">Cargando origen...</option>
-      </select>
-      <select id="destino-select">
-        <option value="">Cargando destino...</option>
-      </select>
+  <header class="main-header">
+    <div class="brand">
+      <div class="brand-logo">✈️</div>
+      <div>
+        <h1>Portal de Encomiendas Lapticon</h1>
+        <p class="subtitle">Red Panamericana Exclusiva: Bogotá • Medellín • São Paulo • New York • México • Toronto</p>
+      </div>
     </div>
+    <div class="system-badge">
+      <span class="pulse-dot"></span> RADAR EN VIVO
+    </div>
+  </header>
 
-    <!-- Bloque 3: Crear encomienda -->
-    <h2>Registrar encomienda</h2>
-    <form id="encomienda-form">
-      <input type="text" id="valor-input" placeholder="Valor (ej. 50)" required />
-      <select id="moneda-select">
-        <option value="USD">USD</option>
-        <option value="COP">COP</option>
-      </select>
-      <input type="text" id="observaciones-input" placeholder="Observaciones (ej. Caja frágil)" required />
-      <button type="submit">Crear encomienda</button>
-    </form>
-    <p id="encomienda-status"></p>
+  <main class="container">
+    <!-- Bloque 1: Login -->
+    <section id="login-section" class="card login-card">
+      <div class="card-header">
+        <h2>🔐 Acceso a Torre de Control</h2>
+        <p>Inicia sesión con tu cuenta de Lapticon para activar el radar de envíos.</p>
+      </div>
+      <form id="login-form">
+        <div class="input-group">
+          <label for="login-email">Correo electrónico</label>
+          <input type="email" id="login-email" placeholder="test30@gmail.com" required />
+        </div>
+        <div class="input-group">
+          <label for="login-password">Contraseña</label>
+          <input type="password" id="login-password" placeholder="1234567" required />
+        </div>
+        <button type="submit" class="btn-primary">Ingresar al Radar</button>
+      </form>
+      <p id="login-status" class="status-msg"></p>
+    </section>
 
-    <!-- Bloque 4: Listar mis encomiendas -->
-    <h2>Mis encomiendas</h2>
-    <table id="encomiendas-table">
-      <thead>
-        <tr>
-          <th>Origen</th>
-          <th>Destino</th>
-          <th>Estado</th>
-          <th>Valor</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody id="encomiendas-body"></tbody>
-    </table>
-  </section>
+    <!-- El resto de la app queda oculto hasta iniciar sesión -->
+    <section id="app-section" hidden>
+      <div class="user-bar">
+        <p id="welcome-message"></p>
+        <div class="stats-pills">
+          <span class="pill">🛰️ 6 Hubs Activos</span>
+          <span class="pill" id="contador-envios">📦 1 Envío en curso</span>
+        </div>
+      </div>
+
+      <!-- MAPA MUNDI CON LAS 6 CIUDADES FIJAS Y EL AVIÓN -->
+      <div class="map-card card">
+        <div class="map-overlay-header">
+          <div>
+            <span class="radar-tag">LIVE FLIGHT TRACKER</span>
+            <h3 id="ruta-activa-label">Ruta Activa: Bogotá ➔ New York</h3>
+          </div>
+          <div class="flight-telemetry">
+            <span id="telemetry-status">EN VUELO</span>
+            <span id="telemetry-distance">DIST: 3,995 KM</span>
+          </div>
+        </div>
+
+        <div class="world-map-container">
+          <svg viewBox="0 0 1000 500" class="map-svg" id="radar-svg">
+            <defs>
+              <linearGradient id="cyberGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#ff2a85" />
+                <stop offset="50%" stop-color="#a855f7" />
+                <stop offset="100%" stop-color="#00f5d4" />
+              </linearGradient>
+
+              <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="4" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+
+            <!-- Cuadrícula de fondo -->
+            <g stroke="rgba(168, 85, 247, 0.12)" stroke-width="1">
+              <line x1="0" y1="100" x2="1000" y2="100" />
+              <line x1="0" y1="200" x2="1000" y2="200" />
+              <line x1="0" y1="300" x2="1000" y2="300" stroke-dasharray="6,6" />
+              <line x1="0" y1="400" x2="1000" y2="400" />
+              <line x1="200" y1="0" x2="200" y2="500" />
+              <line x1="400" y1="0" x2="400" y2="500" stroke-dasharray="6,6" />
+              <line x1="600" y1="0" x2="600" y2="500" />
+              <line x1="800" y1="0" x2="800" y2="500" />
+            </g>
+
+            <!-- Mapa de América y Mundo Estilizado -->
+            <g fill="#151226" stroke="rgba(168, 85, 247, 0.35)" stroke-width="1.8">
+              <!-- Norteamérica y Centroamérica -->
+              <path d="M 80,40 L 350,35 L 410,95 L 365,175 L 305,215 L 245,245 L 295,275 L 255,280 L 185,235 L 125,155 Z" />
+              <!-- Sudamérica -->
+              <path d="M 295,275 L 425,290 L 520,365 L 455,470 L 365,480 L 325,385 L 280,315 Z" />
+              <!-- Europa y África (Referencia visual derecha) -->
+              <path d="M 590,50 L 820,45 L 870,165 L 650,185 L 580,130 Z" opacity="0.35" />
+              <path d="M 610,205 L 775,210 L 810,360 L 710,450 L 620,330 Z" opacity="0.35" />
+            </g>
+
+            <!-- Línea recta de sombra entre las dos ciudades -->
+            <path id="flight-shadow" d="M 335 305 L 355 135" fill="none" stroke="rgba(255, 42, 133, 0.2)" stroke-width="1.5" stroke-dasharray="4,4" />
+
+            <!-- Arco de vuelo activo -->
+            <path id="flight-path" d="M 335 305 Q 250 200 355 135" fill="none" stroke="url(#cyberGrad)" stroke-width="4" stroke-dasharray="10,6" filter="url(#glow)" />
+
+            <!-- =========================================================
+                 LAS 6 CIUDADES FIJAS EN EL MAPA (Coordenadas Exactas)
+                 ========================================================= -->
+            <!-- 1. Toronto (320, 95) -->
+            <g class="hub-pin" id="pin-Toronto" transform="translate(320, 95)">
+              <circle r="5" fill="#94a3b8" class="hub-dot" />
+              <text x="-12" y="-10" text-anchor="end" class="hub-text">TORONTO</text>
+            </g>
+
+            <!-- 2. New York (355, 135) -->
+            <g class="hub-pin" id="pin-New York" transform="translate(355, 135)">
+              <circle r="5" fill="#94a3b8" class="hub-dot" />
+              <text x="14" y="4" text-anchor="start" class="hub-text">NEW YORK</text>
+            </g>
+
+            <!-- 3. México (210, 215) -->
+            <g class="hub-pin" id="pin-México" transform="translate(210, 215)">
+              <circle r="5" fill="#94a3b8" class="hub-dot" />
+              <text x="-12" y="4" text-anchor="end" class="hub-text">MÉXICO</text>
+            </g>
+
+            <!-- 4. Medellín (312, 285) -->
+            <g class="hub-pin" id="pin-Medellín" transform="translate(312, 285)">
+              <circle r="5" fill="#94a3b8" class="hub-dot" />
+              <text x="-12" y="-4" text-anchor="end" class="hub-text">MEDELLÍN</text>
+            </g>
+
+            <!-- 5. Bogotá (335, 305) -->
+            <g class="hub-pin" id="pin-Bogotá" transform="translate(335, 305)">
+              <circle r="5" fill="#94a3b8" class="hub-dot" />
+              <text x="14" y="6" text-anchor="start" class="hub-text">BOGOTÁ</text>
+            </g>
+
+            <!-- 6. São Paulo (475, 405) -->
+            <g class="hub-pin" id="pin-São Paulo" transform="translate(475, 405)">
+              <circle r="5" fill="#94a3b8" class="hub-dot" />
+              <text x="14" y="5" text-anchor="start" class="hub-text">SÃO PAULO</text>
+            </g>
+
+            <!-- Anillo Indicador de ORIGEN (Rosa Neón) -->
+            <g id="origin-marker" transform="translate(335, 305)">
+              <circle r="18" fill="rgba(255, 42, 133, 0.25)" class="pulse-ring" />
+              <circle r="8" fill="none" stroke="#ff2a85" stroke-width="2.5" />
+              <circle r="4" fill="#ff2a85" />
+            </g>
+
+            <!-- Anillo Indicador de DESTINO (Turquesa Neón) -->
+            <g id="dest-marker" transform="translate(355, 135)">
+              <circle r="18" fill="rgba(0, 245, 212, 0.25)" class="pulse-ring" />
+              <circle r="8" fill="none" stroke="#00f5d4" stroke-width="2.5" />
+              <circle r="4" fill="#00f5d4" />
+            </g>
+
+            <!-- AVIÓN DE CARGA (Amarillo/Cian con fuego trasero) -->
+            <g id="cargo-plane" transform="translate(335, 305)">
+              <!-- Estela de turbina -->
+              <polygon points="-32,0 -12,-5 -12,5" fill="#ff2a85" opacity="0.85" filter="url(#glow)" />
+              <polygon points="-22,0 -10,-2.5 -10,2.5" fill="#fde047" />
+              <!-- Cuerpo del Jet (Apunta a la derecha 0 grados por base) -->
+              <path d="M 20,0 
+                       L 9,3 
+                       L -2,18 
+                       L -8,18 
+                       L -3,3 
+                       L -14,2.5 
+                       L -19,9 
+                       L -23,9 
+                       L -19,0 
+                       L -23,-9 
+                       L -19,-9 
+                       L -14,-2.5 
+                       L -3,-3 
+                       L -8,-18 
+                       L -2,-18 
+                       L 9,-3 Z" 
+                    fill="#fde047" 
+                    stroke="#070510" 
+                    stroke-width="1.5" 
+                    filter="url(#glow)" />
+              <!-- Cabina -->
+              <ellipse cx="12" cy="0" rx="3" ry="1.5" fill="#070510" />
+            </g>
+          </svg>
+        </div>
+
+        <!-- Leyenda inferior del mapa -->
+        <div class="map-legend">
+          <span><i class="dot-legend pink"></i> Ciudad de Origen</span>
+          <span><i class="dot-legend teal"></i> Ciudad de Destino</span>
+          <span><i class="dot-legend yellow"></i> Aeronave en Tránsito</span>
+        </div>
+      </div>
+
+      <!-- BLOQUES 2 Y 3 -->
+      <div class="operations-grid">
+        <!-- Bloque 2: Catálogo de ciudades -->
+        <div class="card">
+          <h2>🌍 1. Seleccionar Ciudades (Origen y Destino)</h2>
+          <p class="card-desc">Cambia cualquiera de las dos ciudades y observa cómo el mapa actualiza la ruta de inmediato.</p>
+          <div class="select-stack">
+            <div class="input-group">
+              <label for="origen-select">🛫 Ciudad de Origen</label>
+              <select id="origen-select">
+                <option value="Bogotá" selected>Bogotá</option>
+                <option value="Medellín">Medellín</option>
+                <option value="São Paulo">São Paulo</option>
+                <option value="New York">New York</option>
+                <option value="México">México</option>
+                <option value="Toronto">Toronto</option>
+              </select>
+            </div>
+
+            <div class="route-divider">⬇ RUTA AÉREA ⬇</div>
+
+            <div class="input-group">
+              <label for="destino-select">🛬 Ciudad de Destino</label>
+              <select id="destino-select">
+                <option value="Bogotá">Bogotá</option>
+                <option value="Medellín">Medellín</option>
+                <option value="São Paulo">São Paulo</option>
+                <option value="New York" selected>New York</option>
+                <option value="México">México</option>
+                <option value="Toronto">Toronto</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bloque 3: Crear encomienda -->
+        <div class="card">
+          <h2>📦 2. Registrar Encomienda</h2>
+          <p class="card-desc">Completa los datos para despachar el avión a máxima velocidad por la ruta seleccionada.</p>
+          <form id="encomienda-form">
+            <div class="form-row">
+              <div class="input-group flex-2">
+                <label for="valor-input">Valor del Envío</label>
+                <input type="number" id="valor-input" placeholder="Ej. 150" required />
+              </div>
+              <div class="input-group flex-1">
+                <label for="moneda-select">Moneda</label>
+                <select id="moneda-select">
+                  <option value="USD">USD</option>
+                  <option value="COP">COP</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
+              <label for="observaciones-input">Observaciones del Paquete</label>
+              <input type="text" id="observaciones-input" placeholder="Ej. Maleta con documentos urgentes" required />
+            </div>
+            <button type="submit" class="btn-dispatch">🚀 Crear Encomienda y Despachar Vuelo</button>
+          </form>
+          <p id="encomienda-status" class="status-msg"></p>
+        </div>
+      </div>
+
+      <!-- Bloque 4: Listar mis encomiendas -->
+      <div class="card table-card">
+        <div class="table-header-box">
+          <h2>📋 Mis Encomiendas</h2>
+          <span class="subtitle-small">Haz clic en cualquier fila para ver su ruta en el mapa</span>
+        </div>
+        <div class="table-responsive">
+          <table id="encomiendas-table">
+            <thead>
+              <tr>
+                <th>Origen</th>
+                <th>Destino</th>
+                <th>Estado</th>
+                <th>Valor</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="encomiendas-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <script src="script.js"></script>
 </body>
