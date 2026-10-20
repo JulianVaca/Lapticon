@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Portal de Encomiendas Lapticon</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Portal de Encomiendas Lapticon</h1>
+
+  <!-- Bloque 1: Login -->
+  <section id="login-section">
+    <h2>Iniciar sesión</h2>
+    <form id="login-form">
+      <input type="email" id="login-email" placeholder="Correo" required />
+      <input type="password" id="login-password" placeholder="Contraseña" required />
+      <button type="submit">Ingresar</button>
+    </form>
+    <p id="login-status"></p>
+  </section>
+
+  <!-- El resto de la app queda oculto hasta iniciar sesión -->
+  <section id="app-section" hidden>
+    <p id="welcome-message"></p>
+
+    <!-- Bloque 2: Catálogo de ciudades -->
+    <h2>Ciudades</h2>
+    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+      <select id="origen-select">
+        <option value="">Cargando origen...</option>
+      </select>
+      <select id="destino-select">
+        <option value="">Cargando destino...</option>
+      </select>
+    </div>
+
+    <!-- Bloque 3: Crear encomienda -->
+    <h2>Registrar encomienda</h2>
+    <form id="encomienda-form">
+      <input type="text" id="valor-input" placeholder="Valor (ej. 50)" required />
+      <select id="moneda-select">
+        <option value="USD">USD</option>
+        <option value="COP">COP</option>
+      </select>
+      <input type="text" id="observaciones-input" placeholder="Observaciones (ej. Caja frágil)" required />
+      <button type="submit">Crear encomienda</button>
+    </form>
+    <p id="encomienda-status"></p>
+
+    <!-- Bloque 4: Listar mis encomiendas -->
+    <h2>Mis encomiendas</h2>
+    <table id="encomiendas-table">
+      <thead>
+        <tr>
+          <th>Origen</th>
+          <th>Destino</th>
+          <th>Estado</th>
+          <th>Valor</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="encomiendas-body"></tbody>
+    </table>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
