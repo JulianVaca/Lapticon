@@ -62,8 +62,32 @@ function biomeColor(lon, lat, seed) {
   else if (a > 16) base = (lon > -20 && lon < 75) || (lon > 112 && lat < 0) ? BIOMES.arid : BIOMES.savanna
   else if (a > 9) base = BIOMES.savanna
   else base = BIOMES.tropical
-  const j = 0.88 + seed * 0.24
+  // 5 tonos por bioma: permite agrupar países y pintar ~35 rellenos en vez de ~180
+  const j = 0.88 + (Math.round(seed * 4) / 4) * 0.24
   return rgb(base.map((v) => clamp(v * j, 0, 255)))
+}
+
+// Avión con resplandor pre-renderizado (evita shadowBlur en cada cuadro)
+const SPRITE_SCALE = 4
+let planeSprite = null
+function getPlaneSprite() {
+  if (planeSprite) return planeSprite
+  const size = 40 * SPRITE_SCALE
+  const c = document.createElement('canvas')
+  c.width = c.height = size
+  const g = c.getContext('2d')
+  g.translate(size / 2, size / 2)
+  g.scale(SPRITE_SCALE, SPRITE_SCALE)
+  g.shadowColor = 'rgba(232, 180, 90, 0.9)'
+  g.shadowBlur = 14 * SPRITE_SCALE
+  g.fillStyle = C.ivory
+  g.fill(PLANE)
+  g.shadowBlur = 0
+  g.strokeStyle = 'rgba(8, 29, 44, 0.65)'
+  g.lineWidth = 0.8
+  g.stroke(PLANE)
+  planeSprite = c
+  return c
 }
 
 function subsolar(date = new Date()) {
@@ -80,8 +104,14 @@ function buildLayer(topo) {
     const [lon, lat] = geoCentroid(f)
     f.fill = biomeColor(lon, lat, hash(String(f.id ?? f.properties.name)))
   }
+  const byFill = new Map()
+  for (const f of countries) {
+    if (!byFill.has(f.fill)) byFill.set(f.fill, { type: 'FeatureCollection', features: [] })
+    byFill.get(f.fill).features.push(f)
+  }
   return {
     countries,
+    groups: [...byFill].map(([fill, fc]) => ({ fill, fc })),
     borders: mesh(topo, obj, (a, b) => a !== b),
     coast: mesh(topo, obj, (a, b) => a === b),
   }
@@ -150,7 +180,8 @@ export class EarthMap {
   // ---------- geometría ----------
   resize() {
     const r = this.canvas.getBoundingClientRect()
-    this.dpr = Math.min(window.devicePixelRatio || 1, 2)
+    const coarse = window.matchMedia('(pointer: coarse)').matches
+    this.dpr = Math.min(window.devicePixelRatio || 1, this.opts.maxDpr || (coarse ? 1.5 : 2))
     this.w = Math.max(1, Math.round(r.width))
     this.h = Math.max(1, Math.round(r.height))
     for (const c of [this.canvas, this.base]) {
@@ -336,7 +367,15 @@ export class EarthMap {
 
     el.addEventListener('pointermove', (e) => {
       const p = local(e)
-      if (!pts.has(e.pointerId)) return this.hover(p)
+      if (!pts.has(e.pointerId)) {
+        // detección de país como mucho una vez por cuadro
+        if (!this.hoverPending) requestAnimationFrame(() => {
+          this.hover(this.hoverPending)
+          this.hoverPending = null
+        })
+        this.hoverPending = p
+        return
+      }
       pts.set(e.pointerId, p)
       if (pinch && pts.size === 2) {
         const [a, b] = [...pts.values()]
@@ -462,6 +501,11 @@ export class EarthMap {
 
   frame(now) {
     this.raf = null
+    // Límite de FPS opcional (el globo decorativo no necesita 60/120 fps)
+    if (this.opts.maxFps && now - this.last < 1000 / this.opts.maxFps - 3) {
+      this.raf = requestAnimationFrame(this.frame)
+      return
+    }
     const dt = Math.min(0.05, (now - this.last) / 1000)
     this.last = now
     this.time += dt
@@ -554,10 +598,10 @@ export class EarthMap {
     ctx.stroke()
 
     // Países (bioma)
-    for (const f of layer.countries) {
+    for (const g of layer.groups) {
       ctx.beginPath()
-      path(f)
-      ctx.fillStyle = f.fill
+      path(g.fc)
+      ctx.fillStyle = g.fill
       ctx.fill()
     }
     ctx.beginPath()
@@ -686,11 +730,13 @@ export class EarthMap {
       g.addColorStop(0, single ? C.origin : 'rgba(232,180,90,0.5)')
       g.addColorStop(1, single ? C.dest : 'rgba(98,205,194,0.8)')
       ctx.save()
+      ctx.lineCap = 'round'
+      // halo: trazo ancho translúcido en lugar de shadowBlur
+      ctx.strokeStyle = 'rgba(232, 180, 90, 0.16)'
+      ctx.lineWidth = single ? 9 : 5
+      this.strokeSegments(done)
       ctx.strokeStyle = g
       ctx.lineWidth = single ? 2.4 : 1.5
-      ctx.lineCap = 'round'
-      ctx.shadowColor = 'rgba(232, 180, 90, 0.55)'
-      ctx.shadowBlur = single ? 12 : 6
       this.strokeSegments(done)
       ctx.restore()
     }
@@ -733,18 +779,13 @@ export class EarthMap {
     }
     ctx.restore()
 
+    const sprite = getPlaneSprite()
+    const half = sprite.width / SPRITE_SCALE / 2
     ctx.save()
     ctx.translate(here.x, here.y)
     ctx.rotate(ang)
     ctx.scale(size, size)
-    ctx.shadowColor = 'rgba(232, 180, 90, 0.9)'
-    ctx.shadowBlur = 14
-    ctx.fillStyle = C.ivory
-    ctx.fill(PLANE)
-    ctx.shadowBlur = 0
-    ctx.strokeStyle = 'rgba(8, 29, 44, 0.65)'
-    ctx.lineWidth = 0.8
-    ctx.stroke(PLANE)
+    ctx.drawImage(sprite, -half, -half, half * 2, half * 2)
     ctx.restore()
   }
 

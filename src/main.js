@@ -23,7 +23,8 @@ const canHover = window.matchMedia('(hover: hover)').matches
 // =====================================================
 let lenis = null
 if (!reduce) {
-  lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 0.95 })
+  // lerp más alto = el scroll responde antes a la rueda (menos sensación de retraso)
+  lenis = new Lenis({ lerp: 0.16, wheelMultiplier: 1 })
   lenis.on('scroll', ScrollTrigger.update)
   gsap.ticker.add((t) => lenis.raf(t * 1000))
   gsap.ticker.lagSmoothing(0)
@@ -215,7 +216,7 @@ function buildHubList(showcase) {
 
 function initShowcase() {
   const canvas = $('#showcase-canvas')
-  const showcase = new EarthMap(canvas, { interactive: false, autoRotate: 7, detail: 'low', labels: 'code' })
+  const showcase = new EarthMap(canvas, { interactive: false, autoRotate: 7, detail: 'low', labels: 'code', maxFps: 30, maxDpr: 1.5 })
   showcase.rot = [80, -8]
   buildHubList(showcase)
   const io = new IntersectionObserver(
@@ -266,6 +267,7 @@ function initMap() {
   map = new EarthMap($('#map-canvas'), {
     interactive: true,
     detail: 'high',
+    maxFps: 60,
     labels: 'full',
     tooltip: $('#map-tooltip'),
     onHubClick: (city) => {

@@ -142,12 +142,20 @@ a {
   height: 7px;
   border-radius: 50%;
   background: var(--lagoon);
-  box-shadow: 0 0 0 0 rgba(98, 205, 194, 0.6);
+  position: relative;
+}
+/* Pulso con transform/opacity: lo anima la GPU sin repintar */
+.live-dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(98, 205, 194, 0.55);
   animation: live 2s var(--ease) infinite;
 }
 @keyframes live {
-  0% { box-shadow: 0 0 0 0 rgba(98, 205, 194, 0.55); }
-  100% { box-shadow: 0 0 0 10px rgba(98, 205, 194, 0); }
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(3.8); opacity: 0; }
 }
 
 /* ---------- Marca ---------- */
@@ -462,6 +470,7 @@ a {
   object-fit: cover;
   object-position: 60% 50%;
   transform-origin: 60% 50%;
+  will-change: transform;
 }
 .hero-shade {
   position: absolute;
@@ -492,6 +501,7 @@ a {
   grid-template-columns: minmax(0, 1.25fr) minmax(320px, 420px);
   gap: clamp(2rem, 5vw, 5rem);
   align-items: center;
+  will-change: transform, opacity;
 }
 .hero-title {
   margin: 1.4rem 0 1.4rem;
@@ -660,11 +670,8 @@ a {
   position: absolute;
   inset: -2%;
   border-radius: 50%;
+  /* fijo: girar un borde punteado obligaba a redibujarlo en cada cuadro */
   border: 1px dashed rgba(207, 227, 223, 0.1);
-  animation: orbit 60s linear infinite;
-}
-@keyframes orbit {
-  to { transform: rotate(360deg); }
 }
 .showcase-globe canvas {
   width: 100%;
@@ -753,7 +760,7 @@ a {
   height: 100%;
   object-fit: cover;
   transition: filter 0.6s var(--ease);
-  filter: saturate(0.92) contrast(1.04);
+  will-change: transform;
 }
 .fleet-card::after {
   content: '';
@@ -835,6 +842,7 @@ a {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  will-change: transform;
 }
 .process-banner::after {
   content: '';
