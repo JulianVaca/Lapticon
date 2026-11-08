@@ -3,296 +3,304 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portal de Encomiendas Lapticon | Radar Aéreo</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="theme-color" content="#06121c" />
+  <meta name="description" content="Lapticon: red panamericana de encomiendas aéreas con seguimiento en vivo sobre un globo terráqueo interactivo." />
+  <title>Lapticon · Encomiendas Aéreas Panamericanas</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230b2233'/%3E%3Cpath d='M14 36l36-14-10 26-8-9-9 5 3-8z' fill='%23e8b45a'/%3E%3C/svg%3E" />
+  <link rel="preload" as="image" href="./img/hero-ala-atardecer.webp" imagesrcset="./img/hero-ala-atardecer-sm.webp 900w, ./img/hero-ala-atardecer.webp 1920w" imagesizes="100vw" />
 </head>
 <body>
-  <div class="bg-cyber"></div>
+  <!-- Sprite de iconos (trazo fino, estilo arquitectónico) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-plane" viewBox="0 0 24 24"><path d="M2.5 13.5l19-7.5-5 15-4-5.5-5 2.5 1.5-4.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.8 3 2.8 15 0 18M12 3c-2.8 3-2.8 15 0 18"/></g></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M3 7.5L12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5l9 4.5 9-4.5M12 12v9"/></g></symbol>
+    <symbol id="i-swap" viewBox="0 0 24 24"><path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></g></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 018 0v3"/></g></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 3l9.5 17h-19z" stroke-linejoin="round"/><path d="M12 10v4M12 17.5v.01"/></g></symbol>
+  </svg>
 
-  <header class="main-header">
-    <div class="brand">
-      <div class="brand-logo">✈️</div>
-      <div>
-        <h1>Portal de Encomiendas Lapticon</h1>
-        <p class="subtitle">Red Panamericana Exclusiva: Bogotá • Medellín • São Paulo • New York • México • Toronto</p>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- ===================== PORTADA ===================== -->
+  <div id="landing">
+    <header class="nav" data-reveal-nav>
+      <a class="brand" href="#top" aria-label="Lapticon, inicio">
+        <span class="brand-mark"><svg><use href="#i-plane"/></svg></span>
+        <span class="brand-word">LAPTICON</span>
+      </a>
+      <nav class="nav-links" aria-label="Secciones">
+        <a href="#red">Red</a>
+        <a href="#flota">Flota</a>
+        <a href="#proceso">Proceso</a>
+      </nav>
+      <a class="nav-cta" href="#acceso">Acceder <svg><use href="#i-arrow"/></svg></a>
+    </header>
+
+    <section class="hero" id="top">
+      <div class="hero-media" aria-hidden="true">
+        <img src="./img/hero-ala-atardecer.webp" srcset="./img/hero-ala-atardecer-sm.webp 900w, ./img/hero-ala-atardecer.webp 1920w" sizes="100vw" alt="" fetchpriority="high" />
       </div>
-    </div>
-    <div class="system-badge">
-      <span class="pulse-dot"></span> RADAR EN VIVO
-    </div>
-  </header>
+      <div class="hero-shade" aria-hidden="true"></div>
+      <div class="hero-lines" aria-hidden="true"></div>
 
-  <main class="container">
-    <!-- Bloque 1: Login -->
-    <section id="login-section" class="card login-card">
-      <div class="card-header">
-        <h2>🔐 Acceso a Torre de Control</h2>
-        <p>Inicia sesión con tu cuenta de Lapticon para activar el radar de envíos.</p>
-      </div>
-      <form id="login-form">
-        <div class="input-group">
-          <label for="login-email">Correo electrónico</label>
-          <input type="email" id="login-email" placeholder="test30@gmail.com" required />
-        </div>
-        <div class="input-group">
-          <label for="login-password">Contraseña</label>
-          <input type="password" id="login-password" placeholder="1234567" required />
-        </div>
-        <button type="submit" class="btn-primary">Ingresar al Radar</button>
-      </form>
-      <p id="login-status" class="status-msg"></p>
-    </section>
-
-    <!-- El resto de la app queda oculto hasta iniciar sesión -->
-    <section id="app-section" hidden>
-      <div class="user-bar">
-        <p id="welcome-message"></p>
-        <div class="stats-pills">
-          <span class="pill">🛰️ 6 Hubs Activos</span>
-          <span class="pill" id="contador-envios">📦 1 Envío en curso</span>
-        </div>
-      </div>
-
-      <!-- MAPA MUNDI CON LAS 6 CIUDADES FIJAS Y EL AVIÓN -->
-      <div class="map-card card">
-        <div class="map-overlay-header">
-          <div>
-            <span class="radar-tag">LIVE FLIGHT TRACKER</span>
-            <h3 id="ruta-activa-label">Ruta Activa: Bogotá ➔ New York</h3>
-          </div>
-          <div class="flight-telemetry">
-            <span id="telemetry-status">EN VUELO</span>
-            <span id="telemetry-distance">DIST: 3,995 KM</span>
-          </div>
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="live-dot"></span> Red panamericana · Radar en vivo</p>
+          <h1 class="hero-title">
+            <span class="line"><span>Encomiendas que</span></span>
+            <span class="line"><span>cruzan el <em>continente</em></span></span>
+            <span class="line"><span>a velocidad crucero.</span></span>
+          </h1>
+          <p class="hero-lead">Seis hubs conectados entre Toronto y São Paulo. Registra tu envío, elige la ruta y sigue tu avión sobre un globo terráqueo en tiempo real.</p>
+          <dl class="hero-stats">
+            <div><dt>Hubs activos</dt><dd data-count="6">0</dd></div>
+            <div><dt>Km de red</dt><dd data-count="9300" data-suffix="+">0</dd></div>
+            <div><dt>Velocidad crucero</dt><dd data-count="850" data-suffix=" km/h">0</dd></div>
+          </dl>
         </div>
 
-        <div class="world-map-container">
-          <svg viewBox="0 0 1000 500" class="map-svg" id="radar-svg">
-            <defs>
-              <linearGradient id="cyberGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#ff2a85" />
-                <stop offset="50%" stop-color="#a855f7" />
-                <stop offset="100%" stop-color="#00f5d4" />
-              </linearGradient>
-
-              <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-                <feGaussianBlur stdDeviation="4" result="blur" />
-                <feMerge>
-                  <feMergeNode in="blur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-            </defs>
-
-            <!-- Cuadrícula de fondo -->
-            <g stroke="rgba(168, 85, 247, 0.12)" stroke-width="1">
-              <line x1="0" y1="100" x2="1000" y2="100" />
-              <line x1="0" y1="200" x2="1000" y2="200" />
-              <line x1="0" y1="300" x2="1000" y2="300" stroke-dasharray="6,6" />
-              <line x1="0" y1="400" x2="1000" y2="400" />
-              <line x1="200" y1="0" x2="200" y2="500" />
-              <line x1="400" y1="0" x2="400" y2="500" stroke-dasharray="6,6" />
-              <line x1="600" y1="0" x2="600" y2="500" />
-              <line x1="800" y1="0" x2="800" y2="500" />
-            </g>
-
-            <!-- Mapa de América y Mundo Estilizado -->
-            <g fill="#151226" stroke="rgba(168, 85, 247, 0.35)" stroke-width="1.8">
-              <!-- Norteamérica y Centroamérica -->
-              <path d="M 80,40 L 350,35 L 410,95 L 365,175 L 305,215 L 245,245 L 295,275 L 255,280 L 185,235 L 125,155 Z" />
-              <!-- Sudamérica -->
-              <path d="M 295,275 L 425,290 L 520,365 L 455,470 L 365,480 L 325,385 L 280,315 Z" />
-              <!-- Europa y África (Referencia visual derecha) -->
-              <path d="M 590,50 L 820,45 L 870,165 L 650,185 L 580,130 Z" opacity="0.35" />
-              <path d="M 610,205 L 775,210 L 810,360 L 710,450 L 620,330 Z" opacity="0.35" />
-            </g>
-
-            <!-- Línea recta de sombra entre las dos ciudades -->
-            <path id="flight-shadow" d="M 335 305 L 355 135" fill="none" stroke="rgba(255, 42, 133, 0.2)" stroke-width="1.5" stroke-dasharray="4,4" />
-
-            <!-- Arco de vuelo activo -->
-            <path id="flight-path" d="M 335 305 Q 250 200 355 135" fill="none" stroke="url(#cyberGrad)" stroke-width="4" stroke-dasharray="10,6" filter="url(#glow)" />
-
-            <!-- =========================================================
-                 LAS 6 CIUDADES FIJAS EN EL MAPA (Coordenadas Exactas)
-                 ========================================================= -->
-            <!-- 1. Toronto (320, 95) -->
-            <g class="hub-pin" id="pin-Toronto" transform="translate(320, 95)">
-              <circle r="5" fill="#94a3b8" class="hub-dot" />
-              <text x="-12" y="-10" text-anchor="end" class="hub-text">TORONTO</text>
-            </g>
-
-            <!-- 2. New York (355, 135) -->
-            <g class="hub-pin" id="pin-New York" transform="translate(355, 135)">
-              <circle r="5" fill="#94a3b8" class="hub-dot" />
-              <text x="14" y="4" text-anchor="start" class="hub-text">NEW YORK</text>
-            </g>
-
-            <!-- 3. México (210, 215) -->
-            <g class="hub-pin" id="pin-México" transform="translate(210, 215)">
-              <circle r="5" fill="#94a3b8" class="hub-dot" />
-              <text x="-12" y="4" text-anchor="end" class="hub-text">MÉXICO</text>
-            </g>
-
-            <!-- 4. Medellín (312, 285) -->
-            <g class="hub-pin" id="pin-Medellín" transform="translate(312, 285)">
-              <circle r="5" fill="#94a3b8" class="hub-dot" />
-              <text x="-12" y="-4" text-anchor="end" class="hub-text">MEDELLÍN</text>
-            </g>
-
-            <!-- 5. Bogotá (335, 305) -->
-            <g class="hub-pin" id="pin-Bogotá" transform="translate(335, 305)">
-              <circle r="5" fill="#94a3b8" class="hub-dot" />
-              <text x="14" y="6" text-anchor="start" class="hub-text">BOGOTÁ</text>
-            </g>
-
-            <!-- 6. São Paulo (475, 405) -->
-            <g class="hub-pin" id="pin-São Paulo" transform="translate(475, 405)">
-              <circle r="5" fill="#94a3b8" class="hub-dot" />
-              <text x="14" y="5" text-anchor="start" class="hub-text">SÃO PAULO</text>
-            </g>
-
-            <!-- Anillo Indicador de ORIGEN (Rosa Neón) -->
-            <g id="origin-marker" transform="translate(335, 305)">
-              <circle r="18" fill="rgba(255, 42, 133, 0.25)" class="pulse-ring" />
-              <circle r="8" fill="none" stroke="#ff2a85" stroke-width="2.5" />
-              <circle r="4" fill="#ff2a85" />
-            </g>
-
-            <!-- Anillo Indicador de DESTINO (Turquesa Neón) -->
-            <g id="dest-marker" transform="translate(355, 135)">
-              <circle r="18" fill="rgba(0, 245, 212, 0.25)" class="pulse-ring" />
-              <circle r="8" fill="none" stroke="#00f5d4" stroke-width="2.5" />
-              <circle r="4" fill="#00f5d4" />
-            </g>
-
-            <!-- AVIÓN DE CARGA (Amarillo/Cian con fuego trasero) -->
-            <g id="cargo-plane" transform="translate(335, 305)">
-              <!-- Estela de turbina -->
-              <polygon points="-32,0 -12,-5 -12,5" fill="#ff2a85" opacity="0.85" filter="url(#glow)" />
-              <polygon points="-22,0 -10,-2.5 -10,2.5" fill="#fde047" />
-              <!-- Cuerpo del Jet (Apunta a la derecha 0 grados por base) -->
-              <path d="M 20,0 
-                       L 9,3 
-                       L -2,18 
-                       L -8,18 
-                       L -3,3 
-                       L -14,2.5 
-                       L -19,9 
-                       L -23,9 
-                       L -19,0 
-                       L -23,-9 
-                       L -19,-9 
-                       L -14,-2.5 
-                       L -3,-3 
-                       L -8,-18 
-                       L -2,-18 
-                       L 9,-3 Z" 
-                    fill="#fde047" 
-                    stroke="#070510" 
-                    stroke-width="1.5" 
-                    filter="url(#glow)" />
-              <!-- Cabina -->
-              <ellipse cx="12" cy="0" rx="3" ry="1.5" fill="#070510" />
-            </g>
-          </svg>
-        </div>
-
-        <!-- Leyenda inferior del mapa -->
-        <div class="map-legend">
-          <span><i class="dot-legend pink"></i> Ciudad de Origen</span>
-          <span><i class="dot-legend teal"></i> Ciudad de Destino</span>
-          <span><i class="dot-legend yellow"></i> Aeronave en Tránsito</span>
-        </div>
-      </div>
-
-      <!-- BLOQUES 2 Y 3 -->
-      <div class="operations-grid">
-        <!-- Bloque 2: Catálogo de ciudades -->
-        <div class="card">
-          <h2>🌍 1. Seleccionar Ciudades (Origen y Destino)</h2>
-          <p class="card-desc">Cambia cualquiera de las dos ciudades y observa cómo el mapa actualiza la ruta de inmediato.</p>
-          <div class="select-stack">
-            <div class="input-group">
-              <label for="origen-select">🛫 Ciudad de Origen</label>
-              <select id="origen-select">
-                <option value="Bogotá" selected>Bogotá</option>
-                <option value="Medellín">Medellín</option>
-                <option value="São Paulo">São Paulo</option>
-                <option value="New York">New York</option>
-                <option value="México">México</option>
-                <option value="Toronto">Toronto</option>
-              </select>
-            </div>
-
-            <div class="route-divider">⬇ RUTA AÉREA ⬇</div>
-
-            <div class="input-group">
-              <label for="destino-select">🛬 Ciudad de Destino</label>
-              <select id="destino-select">
-                <option value="Bogotá">Bogotá</option>
-                <option value="Medellín">Medellín</option>
-                <option value="São Paulo">São Paulo</option>
-                <option value="New York" selected>New York</option>
-                <option value="México">México</option>
-                <option value="Toronto">Toronto</option>
-              </select>
+        <section id="acceso" class="glass login-card" aria-labelledby="login-title">
+          <div class="login-head">
+            <span class="icon-badge"><svg><use href="#i-lock"/></svg></span>
+            <div>
+              <h2 id="login-title">Torre de control</h2>
+              <p>Inicia sesión con tu cuenta Lapticon.</p>
             </div>
           </div>
-        </div>
-
-        <!-- Bloque 3: Crear encomienda -->
-        <div class="card">
-          <h2>📦 2. Registrar Encomienda</h2>
-          <p class="card-desc">Completa los datos para despachar el avión a máxima velocidad por la ruta seleccionada.</p>
-          <form id="encomienda-form">
-            <div class="form-row">
-              <div class="input-group flex-2">
-                <label for="valor-input">Valor del Envío</label>
-                <input type="number" id="valor-input" placeholder="Ej. 150" required />
-              </div>
-              <div class="input-group flex-1">
-                <label for="moneda-select">Moneda</label>
-                <select id="moneda-select">
-                  <option value="USD">USD</option>
-                  <option value="COP">COP</option>
-                </select>
-              </div>
-            </div>
-            <div class="input-group">
-              <label for="observaciones-input">Observaciones del Paquete</label>
-              <input type="text" id="observaciones-input" placeholder="Ej. Maleta con documentos urgentes" required />
-            </div>
-            <button type="submit" class="btn-dispatch">🚀 Crear Encomienda y Despachar Vuelo</button>
+          <form id="login-form" novalidate>
+            <label class="field">
+              <span>Correo electrónico</span>
+              <input type="email" id="login-email" autocomplete="email" placeholder="test30@gmail.com" required />
+            </label>
+            <label class="field">
+              <span>Contraseña</span>
+              <input type="password" id="login-password" autocomplete="current-password" placeholder="••••••••" required />
+            </label>
+            <button type="submit" class="btn btn-primary" id="login-btn">
+              <span class="btn-label">Ingresar al radar</span>
+              <svg><use href="#i-arrow"/></svg>
+            </button>
           </form>
-          <p id="encomienda-status" class="status-msg"></p>
-        </div>
+          <p id="login-status" class="status" role="status" aria-live="polite"></p>
+        </section>
       </div>
 
-      <!-- Bloque 4: Listar mis encomiendas -->
-      <div class="card table-card">
-        <div class="table-header-box">
-          <h2>📋 Mis Encomiendas</h2>
-          <span class="subtitle-small">Haz clic en cualquier fila para ver su ruta en el mapa</span>
+      <a class="scroll-cue" href="#red" aria-label="Bajar a la red"><span></span></a>
+    </section>
+
+    <section class="section network" id="red">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">01 — La red</p>
+        <h2>Seis hubs. Un solo cielo.</h2>
+        <p>Rutas de gran círculo, las mismas que trazan los pilotos, calculadas con distancias reales sobre la esfera terrestre.</p>
+      </div>
+      <div class="network-grid">
+        <div class="showcase-globe" data-reveal>
+          <canvas id="showcase-canvas" aria-label="Globo terráqueo con la red de rutas de Lapticon" role="img"></canvas>
         </div>
-        <div class="table-responsive">
-          <table id="encomiendas-table">
-            <thead>
-              <tr>
-                <th>Origen</th>
-                <th>Destino</th>
-                <th>Estado</th>
-                <th>Valor</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="encomiendas-body"></tbody>
-          </table>
+        <ol class="hub-list" id="hub-list" data-reveal-stagger></ol>
+      </div>
+    </section>
+
+    <section class="section fleet" id="flota">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">02 — Flota</p>
+        <h2>Aeronaves para cada encomienda.</h2>
+      </div>
+      <div class="fleet-grid">
+        <figure class="fleet-card tall" data-reveal>
+          <div class="fleet-img"><img src="./img/aterrizaje-valle.webp" alt="Avión comercial aproximándose a la pista sobre un valle verde" loading="lazy" /></div>
+          <figcaption><strong>Aproximación final</strong><span>Aterrizajes de precisión en hubs de montaña como Bogotá y Medellín.</span></figcaption>
+        </figure>
+        <figure class="fleet-card" data-reveal>
+          <div class="fleet-img"><img src="./img/plataforma-carga.webp" alt="Avión en plataforma al atardecer con vehículos de carga" loading="lazy" /></div>
+          <figcaption><strong>Plataforma de carga</strong><span>Despacho y estiba en menos de 40 minutos.</span></figcaption>
+        </figure>
+        <figure class="fleet-card" data-reveal>
+          <div class="fleet-img"><img src="./img/crucero-cielo.webp" alt="Ala de un avión vista desde la ventanilla al atardecer" loading="lazy" /></div>
+          <figcaption><strong>Largo alcance</strong><span>Rutas largas como Toronto ⇄ São Paulo, de día y de noche.</span></figcaption>
+        </figure>
+        <figure class="fleet-card wide" data-reveal>
+          <div class="fleet-img"><img src="./img/jet-ejecutivo.webp" alt="Jet ejecutivo en pista con el sol poniéndose detrás" loading="lazy" /></div>
+          <figcaption><strong>Línea ejecutiva</strong><span>Documentos urgentes con prioridad de despegue.</span></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section process" id="proceso">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">03 — Proceso</p>
+        <h2>Tres pasos hasta el despegue.</h2>
+      </div>
+      <ol class="steps" data-reveal-stagger>
+        <li><span class="step-n">01</span><h3>Elige la ruta</h3><p>Toca dos hubs en el globo o en los selectores. La distancia y el tiempo se calculan al instante.</p></li>
+        <li><span class="step-n">02</span><h3>Registra el paquete</h3><p>Valor, moneda y una nota. Nada más.</p></li>
+        <li><span class="step-n">03</span><h3>Sigue el vuelo</h3><p>Tu avión despega sobre el mapa y puedes volver a ver cualquier ruta desde tu historial.</p></li>
+      </ol>
+      <div class="process-banner" data-reveal>
+        <img src="./img/puerta-embarque.webp" alt="Avión estacionado en puerta de embarque al anochecer" loading="lazy" />
+        <div class="process-banner-copy">
+          <h3>Listo para despachar.</h3>
+          <a class="btn btn-primary" href="#acceso">Ir a la torre de control <svg><use href="#i-arrow"/></svg></a>
         </div>
       </div>
     </section>
-  </main>
 
-  <script src="script.js"></script>
+    <footer class="footer">
+      <span>© Lapticon · Red Panamericana de Encomiendas</span>
+      <span>Fotografía: Unsplash · Cartografía: Natural Earth</span>
+    </footer>
+  </div>
+
+  <!-- ===================== TORRE DE CONTROL (APP) ===================== -->
+  <div id="app" hidden>
+    <header class="app-bar glass">
+      <a class="brand" href="#" aria-label="Lapticon">
+        <span class="brand-mark"><svg><use href="#i-plane"/></svg></span>
+        <span class="brand-word">LAPTICON</span>
+      </a>
+      <div class="app-bar-mid">
+        <span class="live-chip"><span class="live-dot"></span> Radar en vivo</span>
+      </div>
+      <div class="user-chip">
+        <span class="avatar" id="user-avatar">L</span>
+        <span class="user-mail" id="welcome-message"></span>
+        <button class="icon-btn" id="logout-btn" type="button" aria-label="Cerrar sesión" title="Cerrar sesión"><svg><use href="#i-logout"/></svg></button>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <section class="kpis" aria-label="Indicadores">
+        <article class="kpi glass"><span class="kpi-label">Hubs activos</span><strong class="kpi-value">6</strong><span class="kpi-sub">Panamérica</span></article>
+        <article class="kpi glass"><span class="kpi-label">Envíos</span><strong class="kpi-value" id="contador-envios">0</strong><span class="kpi-sub" id="contador-sub">en curso</span></article>
+        <article class="kpi glass"><span class="kpi-label">Distancia de ruta</span><strong class="kpi-value" id="kpi-distance">—</strong><span class="kpi-sub">gran círculo</span></article>
+        <article class="kpi glass"><span class="kpi-label">Tiempo estimado</span><strong class="kpi-value" id="kpi-eta">—</strong><span class="kpi-sub">a 850 km/h</span></article>
+      </section>
+
+      <div class="app-grid">
+        <section class="map-card glass" aria-label="Mapa de vuelo">
+          <div class="map-toolbar">
+            <div>
+              <span class="tag">Live flight tracker</span>
+              <h2 id="ruta-activa-label">Bogotá → New York</h2>
+            </div>
+            <div class="seg" role="group" aria-label="Vista del mapa">
+              <button type="button" class="seg-btn is-active" data-view="globe"><svg><use href="#i-globe"/></svg> Globo</button>
+              <button type="button" class="seg-btn" data-view="flat"><svg><use href="#i-map"/></svg> Plano</button>
+              <span class="seg-thumb" aria-hidden="true"></span>
+            </div>
+          </div>
+
+          <div class="map-stage" id="map-stage">
+            <canvas id="map-canvas" aria-label="Globo terráqueo interactivo: arrastra para girar, rueda para acercar, toca un hub para elegirlo como destino" role="img"></canvas>
+            <div class="map-tooltip" id="map-tooltip" hidden></div>
+            <div class="map-loading" id="map-loading"><span></span> Cargando cartografía…</div>
+
+            <aside class="telemetry glass" aria-label="Telemetría del vuelo">
+              <div class="tele-row"><span>Estado</span><strong id="telemetry-status">En vuelo</strong></div>
+              <div class="tele-row"><span>Progreso</span><strong id="telemetry-progress">0%</strong></div>
+              <div class="tele-bar"><span id="telemetry-bar"></span></div>
+              <div class="tele-row"><span>Altitud</span><strong id="telemetry-alt">0 ft</strong></div>
+              <div class="tele-row"><span>Dist.</span><strong id="telemetry-distance">—</strong></div>
+            </aside>
+
+            <div class="map-controls">
+              <button class="icon-btn" type="button" id="zoom-in" aria-label="Acercar"><svg><use href="#i-plus"/></svg></button>
+              <button class="icon-btn" type="button" id="zoom-out" aria-label="Alejar"><svg><use href="#i-minus"/></svg></button>
+              <button class="icon-btn" type="button" id="recenter" aria-label="Centrar en la ruta"><svg><use href="#i-target"/></svg></button>
+            </div>
+          </div>
+
+          <div class="map-legend">
+            <span><i class="lg lg-origin"></i> Origen</span>
+            <span><i class="lg lg-dest"></i> Destino</span>
+            <span><i class="lg lg-plane"></i> Aeronave</span>
+            <span class="legend-hint">Arrastra para girar · rueda para acercar · toca un hub para fijar destino</span>
+          </div>
+        </section>
+
+        <aside class="side">
+          <section class="panel glass" aria-labelledby="ruta-title">
+            <header class="panel-head">
+              <span class="step-n">01</span>
+              <h2 id="ruta-title">Ruta</h2>
+            </header>
+            <div class="route-picker">
+              <div class="route-field">
+                <span class="route-label"><i class="lg lg-origin"></i> Origen</span>
+                <div class="chips" id="origen-chips" role="radiogroup" aria-label="Ciudad de origen"></div>
+              </div>
+              <button class="swap-btn" type="button" id="swap-btn" aria-label="Intercambiar origen y destino"><svg><use href="#i-swap"/></svg></button>
+              <div class="route-field">
+                <span class="route-label"><i class="lg lg-dest"></i> Destino</span>
+                <div class="chips" id="destino-chips" role="radiogroup" aria-label="Ciudad de destino"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel glass" aria-labelledby="enc-title">
+            <header class="panel-head">
+              <span class="step-n">02</span>
+              <h2 id="enc-title">Registrar encomienda</h2>
+            </header>
+            <form id="encomienda-form" novalidate>
+              <div class="field-row">
+                <label class="field grow">
+                  <span>Valor del envío</span>
+                  <input type="number" id="valor-input" min="1" step="any" inputmode="decimal" placeholder="150" required />
+                </label>
+                <div class="field">
+                  <span>Moneda</span>
+                  <div class="seg seg-sm" role="radiogroup" aria-label="Moneda" id="moneda-seg">
+                    <button type="button" class="seg-btn is-active" data-moneda="USD" role="radio" aria-checked="true">USD</button>
+                    <button type="button" class="seg-btn" data-moneda="COP" role="radio" aria-checked="false">COP</button>
+                    <span class="seg-thumb" aria-hidden="true"></span>
+                  </div>
+                </div>
+              </div>
+              <label class="field">
+                <span>Observaciones del paquete</span>
+                <input type="text" id="observaciones-input" maxlength="140" placeholder="Maleta con documentos urgentes" required />
+              </label>
+              <button type="submit" class="btn btn-primary btn-block" id="dispatch-btn">
+                <svg><use href="#i-plane"/></svg>
+                <span class="btn-label">Crear encomienda y despegar</span>
+              </button>
+            </form>
+            <p id="encomienda-status" class="status" role="status" aria-live="polite"></p>
+          </section>
+        </aside>
+      </div>
+
+      <section class="panel glass shipments" aria-labelledby="list-title">
+        <header class="shipments-head">
+          <div>
+            <h2 id="list-title">Mis encomiendas</h2>
+            <p class="muted">Toca una encomienda para volver a ver su ruta en el mapa.</p>
+          </div>
+          <div class="seg seg-sm" role="group" aria-label="Filtrar encomiendas" id="filter-seg">
+            <button type="button" class="seg-btn is-active" data-filter="todas">Todas</button>
+            <button type="button" class="seg-btn" data-filter="pendiente">Pendientes</button>
+            <button type="button" class="seg-btn" data-filter="cancelada">Canceladas</button>
+            <span class="seg-thumb" aria-hidden="true"></span>
+          </div>
+        </header>
+        <ul class="ship-list" id="encomiendas-body"></ul>
+        <p class="empty" id="ship-empty" hidden>No hay encomiendas en este filtro.</p>
+      </section>
+    </main>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>
