@@ -46,13 +46,6 @@
 html {
   -webkit-text-size-adjust: 100%;
 }
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
 
 body {
   font-family: var(--f-body);
@@ -200,7 +193,6 @@ a {
   font-size: 0.95rem;
   letter-spacing: 0.01em;
   transition: box-shadow 0.4s var(--ease), filter 0.3s;
-  will-change: transform;
 }
 .btn-primary {
   color: #1a1206;
@@ -1537,6 +1529,100 @@ a {
   .hero-stats dd {
     font-size: 1.3rem;
     white-space: nowrap;
+  }
+}
+
+/* =====================================================
+   MOVIMIENTO DE LA PORTADA (solo CSS, compuesto por la GPU)
+   ===================================================== */
+/* Secciones fuera de pantalla: el navegador no las maqueta hasta acercarse */
+#flota,
+#proceso,
+.footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root { --ease-out: cubic-bezier(0.16, 1, 0.3, 1); }
+
+  /* Entrada */
+  html.js .hero-media { animation: settle 2.6s cubic-bezier(0.33, 1, 0.68, 1) both; }
+  /* retrasos cortos: el texto principal (LCP) se pinta enseguida */
+  html.js .nav { animation: drop 0.8s var(--ease-out) 0.05s both; }
+  html.js .hero .eyebrow { animation: rise 0.7s var(--ease-out) 0.05s both; }
+  /* título y párrafo visibles desde el primer cuadro (cuentan para el LCP): solo se deslizan */
+  html.js .hero-title .line { overflow: visible; }
+  html.js .hero-title .line > span { animation: lift 1s var(--ease-out) both; }
+  html.js .hero-title .line:nth-child(1) > span { animation-delay: 0.08s; }
+  html.js .hero-title .line:nth-child(2) > span { animation-delay: 0.16s; }
+  html.js .hero-title .line:nth-child(3) > span { animation-delay: 0.24s; }
+  html.js .hero-lead { animation: lift 0.8s var(--ease-out) 0.1s both; }
+  html.js .hero-stats > div { animation: rise 0.7s var(--ease-out) both; }
+  html.js .hero-stats > div:nth-child(1) { animation-delay: 0.3s; }
+  html.js .hero-stats > div:nth-child(2) { animation-delay: 0.36s; }
+  html.js .hero-stats > div:nth-child(3) { animation-delay: 0.42s; }
+  html.js .login-card { animation: card-in 1s var(--ease-out) 0.2s both; }
+  html.js .scroll-cue { animation: fade 0.8s ease 0.9s both; }
+
+  @keyframes settle { from { transform: scale(1.14); } to { transform: scale(1.04); } }
+  @keyframes drop { from { transform: translateY(-30px); opacity: 0; } }
+  @keyframes rise { from { transform: translateY(18px); opacity: 0; } }
+  @keyframes lift { from { transform: translateY(16px); } }
+  @keyframes card-in { from { transform: translateY(50px); opacity: 0; } }
+  @keyframes fade { from { opacity: 0; } }
+
+  /* Revelados (la clase .is-in la pone un IntersectionObserver) */
+  html.js [data-reveal],
+  html.js [data-reveal-stagger] > * {
+    opacity: 0;
+    transform: translateY(44px);
+    transition: opacity 0.9s var(--ease-out), transform 1s var(--ease-out);
+  }
+  html.js [data-reveal-stagger] > * { transition-delay: calc(var(--i, 0) * 80ms); }
+  html.js [data-reveal].is-in,
+  html.js [data-reveal-stagger].is-in > * {
+    opacity: 1;
+    transform: none;
+  }
+  html.js .process-banner[data-reveal] {
+    clip-path: inset(12% 8% 12% 8% round 28px);
+    transition: opacity 0.9s var(--ease-out), transform 1s var(--ease-out), clip-path 1.4s var(--ease-out);
+  }
+  html.js .process-banner[data-reveal].is-in { clip-path: inset(0 0 0 0 round 28px); }
+
+  .login-card.shake { animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+  @keyframes shake {
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(2px); }
+  }
+
+  /* Parallax ligado al scroll: lo ejecuta el compositor, sin JavaScript */
+  @supports (animation-timeline: scroll()) {
+    .hero-media img {
+      animation: hero-par linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100vh;
+    }
+    .hero-inner {
+      animation: hero-fade linear both;
+      animation-timeline: scroll(root);
+      animation-range: 30vh 100vh;
+    }
+    .fleet-img img,
+    .process-banner img {
+      animation: img-par linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+    @keyframes hero-par { to { transform: translateY(14%); } }
+    @keyframes hero-fade { to { transform: translateY(-8%); opacity: 0.2; } }
+    @keyframes img-par {
+      from { transform: translateY(-7%) scale(1.14); }
+      to { transform: translateY(7%) scale(1.14); }
+    }
   }
 }
 

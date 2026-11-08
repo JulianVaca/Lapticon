@@ -8,12 +8,10 @@ import {
   geoGraticule10,
   geoInterpolate,
   geoDistance,
-  geoCentroid,
   geoCircle,
   geoContains,
   geoRotation,
 } from 'd3-geo'
-import { feature, mesh } from 'topojson-client'
 import gsap from 'gsap'
 import atlasLoUrl from 'world-atlas/countries-110m.json?url'
 import atlasHiUrl from 'world-atlas/countries-50m.json?url'
@@ -28,15 +26,31 @@ const C = {
   graticule: 'rgba(207, 227, 223, 0.075)',
 }
 
-// Biomas aproximados por latitud del centroide de cada país: paleta tierra real.
-const BIOMES = {
-  ice: [226, 233, 228],
-  tundra: [150, 160, 132],
-  boreal: [78, 104, 70],
-  temperate: [104, 128, 76],
-  arid: [196, 163, 108],
-  savanna: [150, 140, 84],
-  tropical: [58, 98, 56],
+// El atlas se procesa en un Web Worker (un solo worker compartido por todos los mapas)
+let worker = null
+let reqId = 0
+const pending = new Map()
+function loadLayer(url) {
+  const abs = new URL(url, location.href).href
+  try {
+    if (!worker) {
+      worker = new Worker(new URL('./atlas-worker.js', import.meta.url), { type: 'module' })
+      worker.onmessage = ({ data }) => {
+        const p = pending.get(data.id)
+        pending.delete(data.id)
+        if (data.error) p.reject(new Error(data.error))
+        else p.resolve(data.layer)
+      }
+    }
+    return new Promise((resolve, reject) => {
+      const id = ++reqId
+      pending.set(id, { resolve, reject })
+      worker.postMessage({ id, url: abs })
+    })
+  } catch {
+    // sin soporte de workers: se procesa aquí mismo
+    return Promise.all([import('./atlas-layer.js'), fetch(abs).then((r) => r.json())]).then(([m, topo]) => m.buildLayer(topo))
+  }
 }
 
 const PLANE = new Path2D(
@@ -44,28 +58,6 @@ const PLANE = new Path2D(
 )
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v))
-const rgb = (c, a = 1) => `rgba(${c[0] | 0}, ${c[1] | 0}, ${c[2] | 0}, ${a})`
-
-function hash(str) {
-  let h = 2166136261
-  for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 16777619)
-  return (h >>> 0) / 4294967295
-}
-
-function biomeColor(lon, lat, seed) {
-  const a = Math.abs(lat)
-  let base
-  if (a > 66) base = BIOMES.ice
-  else if (a > 56) base = BIOMES.tundra
-  else if (a > 46) base = BIOMES.boreal
-  else if (a > 34) base = BIOMES.temperate
-  else if (a > 16) base = (lon > -20 && lon < 75) || (lon > 112 && lat < 0) ? BIOMES.arid : BIOMES.savanna
-  else if (a > 9) base = BIOMES.savanna
-  else base = BIOMES.tropical
-  // 5 tonos por bioma: permite agrupar países y pintar ~35 rellenos en vez de ~180
-  const j = 0.88 + (Math.round(seed * 4) / 4) * 0.24
-  return rgb(base.map((v) => clamp(v * j, 0, 255)))
-}
 
 // Avión con resplandor pre-renderizado (evita shadowBlur en cada cuadro)
 const SPRITE_SCALE = 4
@@ -97,25 +89,6 @@ function subsolar(date = new Date()) {
   return [(12 - h) * 15, decl]
 }
 
-function buildLayer(topo) {
-  const obj = topo.objects.countries
-  const countries = feature(topo, obj).features
-  for (const f of countries) {
-    const [lon, lat] = geoCentroid(f)
-    f.fill = biomeColor(lon, lat, hash(String(f.id ?? f.properties.name)))
-  }
-  const byFill = new Map()
-  for (const f of countries) {
-    if (!byFill.has(f.fill)) byFill.set(f.fill, { type: 'FeatureCollection', features: [] })
-    byFill.get(f.fill).features.push(f)
-  }
-  return {
-    countries,
-    groups: [...byFill].map(([fill, fc]) => ({ fill, fc })),
-    borders: mesh(topo, obj, (a, b) => a !== b),
-    coast: mesh(topo, obj, (a, b) => a === b),
-  }
-}
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -158,8 +131,7 @@ export class EarthMap {
   }
 
   async load() {
-    const lo = await fetch(atlasLoUrl).then((r) => r.json())
-    this.lo = buildLayer(lo)
+    this.lo = await loadLayer(atlasLoUrl)
     this.updateNight()
     this.dirty = true
     this.kick()
@@ -167,8 +139,7 @@ export class EarthMap {
       const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 400))
       idle(async () => {
         try {
-          const hi = await fetch(atlasHiUrl).then((r) => r.json())
-          this.hi = buildLayer(hi)
+          this.hi = await loadLayer(atlasHiUrl)
           this.dirty = true
         } catch {
           /* se queda con la versión ligera */
@@ -502,6 +473,12 @@ export class EarthMap {
   frame(now) {
     this.raf = null
     // Límite de FPS opcional (el globo decorativo no necesita 60/120 fps)
+    // En pausa (p. ej. mientras la página hace scroll) no se dibuja nada
+    if (this.paused) {
+      this.last = now
+      this.raf = requestAnimationFrame(this.frame)
+      return
+    }
     if (this.opts.maxFps && now - this.last < 1000 / this.opts.maxFps - 3) {
       this.raf = requestAnimationFrame(this.frame)
       return
