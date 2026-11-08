@@ -128,53 +128,61 @@ function introLanding() {
     .from('.hero-title .line > span', { yPercent: 115, duration: 1.15, stagger: 0.1 }, 0.4)
     .from('.hero-lead', { y: 20, opacity: 0, duration: 0.9 }, 0.8)
     .from('.hero-stats > div', { y: 20, opacity: 0, duration: 0.8, stagger: 0.08 }, 0.9)
-    .from('.login-card', { y: 50, opacity: 0, rotateX: 8, filter: 'blur(8px)', duration: 1.2 }, 0.6)
+    .from('.login-card', { y: 50, opacity: 0, duration: 1.2 }, 0.6)
     .from('.scroll-cue', { opacity: 0, duration: 0.8 }, 1.4)
   $$('[data-count]').forEach((el, i) => countUp(el, 1 + i * 0.1))
 
-  gsap.to('.hero-media img', {
+  // Los efectos de scroll se preparan después de pintar la portada,
+  // en tareas cortas, para no bloquear el hilo principal al cargar.
+  const tasks = [...scrollEffects()]
+  const idle = window.requestIdleCallback || ((fn) => setTimeout(() => fn({ timeRemaining: () => 8 }), 60))
+  const run = (deadline) => {
+    do tasks.shift()()
+    while (tasks.length && deadline.timeRemaining() > 4)
+    if (tasks.length) idle(run, { timeout: 250 })
+    else ScrollTrigger.refresh()
+  }
+  window.addEventListener('load', () => idle(run, { timeout: 1500 }), { once: true })
+}
+
+function* scrollEffects() {
+  yield () => gsap.to('.hero-media img', {
     yPercent: 14,
     ease: 'none',
-    scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
+    scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true, refreshPriority: -1 },
   })
-  gsap.to('.hero-inner', {
+  yield () => gsap.to('.hero-inner', {
     yPercent: -8,
     opacity: 0.2,
     ease: 'none',
-    scrollTrigger: { trigger: '.hero', start: '30% top', end: 'bottom top', scrub: true },
+    scrollTrigger: { trigger: '.hero', start: '30% top', end: 'bottom top', scrub: true, refreshPriority: -1 },
   })
 
-  $$('[data-reveal]').forEach((el) => {
-    gsap.from(el, {
-      y: 48,
-      opacity: 0,
-      duration: 1.1,
-      ease: 'power3.out',
-      scrollTrigger: { trigger: el, start: 'top 86%' },
+  // Revelados: un solo observador por grupo en lugar de un ScrollTrigger por elemento
+  const reveal = (targets, from, start) => {
+    gsap.set(targets, from)
+    ScrollTrigger.batch(targets, {
+      start,
+      once: true,
+      onEnter: (els) => gsap.to(els, { y: 0, opacity: 1, duration: 1, stagger: 0.09, ease: 'power3.out', overwrite: true }),
     })
-  })
-  $$('[data-reveal-stagger]').forEach((el) => {
-    gsap.from(el.children, {
-      y: 36,
-      opacity: 0,
-      duration: 0.9,
-      stagger: 0.09,
-      ease: 'power3.out',
-      scrollTrigger: { trigger: el, start: 'top 85%' },
-    })
-  })
-  $$('.fleet-img img, .process-banner img').forEach((img) => {
-    gsap.fromTo(
-      img,
-      { yPercent: -7, scale: 1.14 },
-      { yPercent: 7, scale: 1.14, ease: 'none', scrollTrigger: { trigger: img.parentElement, start: 'top bottom', end: 'bottom top', scrub: true } },
-    )
-  })
-  gsap.from('.process-banner', {
+  }
+  yield () => reveal($$('[data-reveal]'), { y: 48, opacity: 0 }, 'top 86%')
+  yield () => reveal($$('[data-reveal-stagger] > *'), { y: 36, opacity: 0 }, 'top 92%')
+
+  for (const img of $$('.fleet-img img, .process-banner img')) {
+    yield () =>
+      gsap.fromTo(
+        img,
+        { yPercent: -7, scale: 1.14 },
+        { yPercent: 7, scale: 1.14, ease: 'none', scrollTrigger: { trigger: img.parentElement, start: 'top bottom', end: 'bottom top', scrub: true } },
+      )
+  }
+  yield () => gsap.from('.process-banner', {
     clipPath: 'inset(12% 8% 12% 8% round 28px)',
     duration: 1.4,
     ease: 'power3.out',
-    scrollTrigger: { trigger: '.process-banner', start: 'top 85%' },
+    scrollTrigger: { trigger: '.process-banner', start: 'top 85%', once: true },
   })
 }
 
